@@ -1,0 +1,53 @@
+from bs4 import BeautifulSoup
+import requests
+#import re
+
+#проверка запустился ли
+print('парсер запущен')
+
+
+#нельзя удалять не факт что парсер будет работать без этого
+#типичный легкий обход конкретно для этого url не более
+cookies = {
+    '_ym_uid': '1783766504529633714',
+    '_ym_d': '1783766504',
+    '_ym_isad': '2',
+    '_gcl_au': '1.1.1417966412.1783766505',
+    '_ga_STVL2Q8BNQ': 'GS2.1.s1783779391$o3$g0$t1783779391$j60$l0$h367738004',
+    '_ga': 'GA1.1.500569578.1783766505',
+    'fav_games': '141',
+    'PHPSESSID': 'KUum-zH-w1ETgeyQB3D6fbzb989rPC71',
+}
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:152.0) Gecko/20100101 Firefox/152.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+    # 'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'Referer': 'https://www.google.com/',
+    'Connection': 'keep-alive',
+    # 'Cookie': '_ym_uid=1783766504529633714; _ym_d=1783766504; _ym_isad=2; _gcl_au=1.1.1417966412.1783766505; _ga_STVL2Q8BNQ=GS2.1.s1783779391$o3$g0$t1783779391$j60$l0$h367738004; _ga=GA1.1.500569578.1783766505; fav_games=141; PHPSESSID=KUum-zH-w1ETgeyQB3D6fbzb989rPC71',
+    'Upgrade-Insecure-Requests': '1',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'cross-site',
+    'Sec-Fetch-User': '?1',
+    'Priority': 'u=0, i',
+    # Requests doesn't support trailers
+    # 'TE': 'trailers',
+}
+#берет url страницы которую нужно скопировать
+response = requests.get('https://funpay.com/chips/99/', cookies=cookies, headers=headers)
+soup = BeautifulSoup(response.text, "lxml")
+
+#берет весь html код страницы 
+with open('w' , encoding = 'utf-8') as file:
+    file.write(response.text)
+
+# находит все строки с ценами внутрь записываеться вместе с html кодом
+rbx_price = soup.find_all("div", class_="tc-price")
+
+# убирает html код и пишет чистую цену
+for item in rbx_price:
+    rbx_price_1 = (item.get_text(strip=True))
+
