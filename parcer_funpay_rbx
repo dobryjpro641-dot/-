@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
-#import re
+import re
+import csv
 
 #проверка запустился ли
 print('парсер запущен')
@@ -39,15 +40,22 @@ headers = {
 #берет url страницы которую нужно скопировать
 response = requests.get('https://funpay.com/chips/99/', cookies=cookies, headers=headers)
 soup = BeautifulSoup(response.text, "lxml")
-
-#берет весь html код страницы 
-with open('w' , encoding = 'utf-8') as file:
-    file.write(response.text)
-
 # находит все строки с ценами внутрь записываеться вместе с html кодом
 rbx_price = soup.find_all("div", class_="tc-price")
 
-# убирает html код и пишет чистую цену
-for item in rbx_price:
-    rbx_price_1 = (item.get_text(strip=True))
+# Создаем файл и открываем его для записи
+# 'w' значит write (запись), encoding='utf-8-sig' нужно, чтобы Excel не ломал русский текст
+with open("prices.csv", mode="w", newline="", encoding="utf-8-sig") as file:
+    writer = csv.writer(file, delimiter=";")
+
+    # Записываем шапку таблицы (названия колонок)
+    writer.writerow(["Номер", "Цена на сайте"])
+
+    # Запускаем цикл и пишем строки
+    for index, item in enumerate(rbx_price, start=1):
+        price_text = item.get_text(strip=True)
+
+        # Пишем в файл: сначала номер по порядку, потом саму цену
+        writer.writerow([index, price_text])
+
 
